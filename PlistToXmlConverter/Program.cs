@@ -31,10 +31,10 @@ namespace PlistToXmlConverter
             var doc = XDocument.Load(uri);
             var xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), new XElement("Items"));
             var root = xml.Root;
-
+            int level = 1;
             foreach (var dict in doc.Descendants("dict"))
             {
-                var item = new XElement("Item", new XAttribute("id", Guid.NewGuid()));
+                var item = new XElement("Item", new XAttribute("id", level++));
                 root.Add(item);
                 XElement tempItem = null;
                 foreach (var inner in dict.Elements())
@@ -52,6 +52,11 @@ namespace PlistToXmlConverter
                 }
 
                 item.Add(new XElement("Rating", 0));
+                item.Add(new XElement("MaxScore", 64));
+                item.Add(new XElement("Score", 0));
+                item.Add(new XElement("IsStarred", false));
+                item.Add(new XElement("IsSolved", false));
+                item.Add(new XElement("AttemptCount", 0));
             }
 
             var xmlPath = args[1];
