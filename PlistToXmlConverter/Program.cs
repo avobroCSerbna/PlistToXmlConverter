@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -28,9 +29,13 @@ namespace PlistToXmlConverter
                 return;
             }
 
-            var doc = XDocument.Load(uri);
+            var allText = File.ReadAllText(uri);
+            var text = allText.Replace(@"\n", "\n").Replace("\\\"", "\"");//.Replace(@"&amp;", "&");
+
+            var doc = XDocument.Parse(text);
             var xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), new XElement("Items"));
             var root = xml.Root;
+            root.Add(new XAttribute("schema_version", 2));
             int level = 1;
             foreach (var dict in doc.Descendants("dict"))
             {
@@ -57,6 +62,7 @@ namespace PlistToXmlConverter
                 item.Add(new XElement("IsStarred", false));
                 item.Add(new XElement("IsSolved", false));
                 item.Add(new XElement("AttemptCount", 0));
+                item.Add(new XElement("Spied", false));
             }
 
             var xmlPath = args[1];
